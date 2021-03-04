@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'HungryToolsOC'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of HungryToolsOC.'
+  s.summary          = 'Some common tools'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,25 +18,35 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+  Some tools often used.
                        DESC
 
-  s.homepage         = 'https://github.com/zhanghaichuan/HungryToolsOC'
+  s.homepage         = 'https://github.com/HungryZ/HungryToolsOC'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'zhanghaichuan' => '924320752@qq.com' }
-  s.source           = { :git => 'https://github.com/zhanghaichuan/HungryToolsOC.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/HungryZ/HungryToolsOC.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-
-  s.ios.deployment_target = '9.0'
-
-  s.source_files = 'HungryToolsOC/Classes/**/*'
   
-  # s.resource_bundles = {
-  #   'HungryToolsOC' => ['HungryToolsOC/Assets/*.png']
-  # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.ios.deployment_target = '9.0'
+  
+  #  s.public_header_files = 'HungryTools/Classes/HungryTools.h'
+  
+  s.default_subspecs = 'UITool', 'Category'
+  
+  #子目录
+  s.subspec 'Macro' do |ss|
+    ss.source_files = 'HungryToolsOC/Classes/Macro/**/*'
+  end
+  s.subspec 'Category' do |ss|
+    ss.source_files = 'HungryToolsOC/Classes/Category/**/*'
+  end
+  s.subspec 'UITool' do |ss|
+    ss.source_files = 'HungryToolsOC/Classes/UITool/**/*'
+#    ss.dependency 'HungryTools/Category'
+    ss.resource_bundles = {
+      'Resource' => ['HungryToolsOC/Assets/Resource/**/*']
+    }
+    
+  end
 end

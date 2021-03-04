@@ -1,0 +1,20 @@
+PODS:
+  - HungryToolsOC (0.1.0):
+    - HungryToolsOC/Category (= 0.1.0)
+    - HungryToolsOC/UITool (= 0.1.0)
+  - HungryToolsOC/Category (0.1.0)
+  - HungryToolsOC/UITool (0.1.0)
+
+DEPENDENCIES:
+  - HungryToolsOC (from `../`)
+
+EXTERNAL SOURCES:
+  HungryToolsOC:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  HungryToolsOC: a053ea75ee69e715ec3f8c79718933521237925a
+
+PODFILE CHECKSUM: 3e52b276bd9b60ff3821754d6d98fd95ad8bdee8
+
+COCOAPODS: 1.10.1

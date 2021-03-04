@@ -1,0 +1,6 @@
+framework module Pods_HungryToolsOC_Example {
+  umbrella header "Pods-HungryToolsOC_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

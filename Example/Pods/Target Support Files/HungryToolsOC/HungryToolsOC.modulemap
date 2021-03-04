@@ -1,0 +1,6 @@
+framework module HungryToolsOC {
+  umbrella header "HungryToolsOC-umbrella.h"
+
+  export *
+  module * { export * }
+}
