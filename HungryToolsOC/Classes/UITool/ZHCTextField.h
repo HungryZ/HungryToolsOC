@@ -32,16 +32,22 @@ typedef NS_ENUM(NSUInteger, ZHCFieldType) {
 @property (nonatomic, assign) int           maxLength;
 
 /// 左视图文字颜色，需在leftText之前赋值
-@property (nonatomic, strong) UIColor *     leftTextColor;
+@property (nonatomic, strong) UIColor *             leftTextColor;
 
 /// 左视图文字颜色，需在leftText之前赋值
-@property (nonatomic, assign) float         leftTextFontSize;
+@property (nonatomic, assign) float                 leftTextFontSize;
 
-@property (nonatomic, copy) NSString *      leftText;
+/// 左视图文字宽度，需在leftText之前赋值
+@property (nonatomic, assign) CGFloat               leftTextWidth;
 
-@property (nonatomic, copy) NSString *      leftImageName;
+/// 左视图文字对齐方式，需在leftText之前赋值
+@property (nonatomic, assign) NSTextAlignment       leftTextLabelAlignment;
 
-@property (nonatomic, strong) UIImage *     leftImage;
+@property (nonatomic, copy) NSString *              leftText;
+
+@property (nonatomic, copy) NSString *              leftImageName;
+
+@property (nonatomic, strong) UIImage *             leftImage;
 
 
 

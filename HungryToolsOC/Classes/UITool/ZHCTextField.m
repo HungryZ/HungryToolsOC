@@ -249,12 +249,25 @@
     if (_leftTextFontSize > 0) {
         textLabel.font = [UIFont systemFontOfSize:_leftTextFontSize];
     }
+    if (_leftTextLabelAlignment) {
+        textLabel.textAlignment = _leftTextLabelAlignment;
+    }
     
     CGFloat textWidth = [textLabel.text sizeWithAttributes:@{NSFontAttributeName : textLabel.font}].width;
     UIView * leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, textWidth + 21, self.bounds.size.height)];
     
     [leftView addSubview:textLabel];
     [self setLeftViewConstraints:textLabel withLeftView:leftView];
+    if (_leftTextWidth) {
+        NSLayoutConstraint *contt = [NSLayoutConstraint constraintWithItem:textLabel
+                                                                 attribute:NSLayoutAttributeWidth
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:nil
+                                                                 attribute:NSLayoutAttributeNotAnAttribute
+                                                                multiplier:1
+                                                                  constant:_leftTextWidth];
+        [leftView addConstraint:contt];
+    }
     
     self.leftView = leftView;
     self.leftViewMode = UITextFieldViewModeAlways;

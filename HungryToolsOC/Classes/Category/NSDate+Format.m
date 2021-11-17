@@ -22,12 +22,13 @@
 }
 
 - (NSDate *)cc_dateByMovingToBeginningOfDay {
-  unsigned int flags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
-  NSDateComponents* parts = [[NSCalendar currentCalendar] components:flags fromDate:self];
-  [parts setHour:0];
-  [parts setMinute:0];
-  [parts setSecond:0];
-  return [[NSCalendar currentCalendar] dateFromComponents:parts];
+    unsigned int flags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+    NSDateComponents *parts = [[NSCalendar currentCalendar] components:flags fromDate:self];
+    [parts setHour:0];
+    [parts setMinute:0];
+    [parts setSecond:0];
+    
+    return [[NSCalendar currentCalendar] dateFromComponents:parts];
 }
 
 @end
