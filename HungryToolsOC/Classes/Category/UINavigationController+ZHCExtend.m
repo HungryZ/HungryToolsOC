@@ -65,6 +65,10 @@
 
 @end
 
+@interface UINavigationController () <UINavigationBarDelegate>
+
+@end
+
 @implementation UINavigationController (ZHCExtend)
 
 #pragma mark - Life Cycle
@@ -79,13 +83,18 @@
     originalMethod = class_getInstanceMethod(self, @selector(setViewControllers:animated:));
     swizzledMethod = class_getInstanceMethod(self, @selector(zhc_setViewControllers:animated:));
     method_exchangeImplementations(originalMethod, swizzledMethod);
-
+    
     originalMethod = class_getInstanceMethod(self, @selector(popViewControllerAnimated:));
     swizzledMethod = class_getInstanceMethod(self, @selector(zhc_popViewControllerAnimated:));
     method_exchangeImplementations(originalMethod, swizzledMethod);
-
+    
     originalMethod = class_getInstanceMethod(self, @selector(preferredStatusBarStyle));
     swizzledMethod = class_getInstanceMethod(self, @selector(zhc_preferredStatusBarStyle));
+    method_exchangeImplementations(originalMethod, swizzledMethod);
+    
+    // 如果直接在这个分类里重写这个代理是没有效果的，需要这样替换掉 TODO: why?
+    originalMethod = class_getInstanceMethod(self, @selector(navigationBar:shouldPopItem:));
+    swizzledMethod = class_getInstanceMethod(self, @selector(zhc_navigationBar:shouldPopItem:));
     method_exchangeImplementations(originalMethod, swizzledMethod);
 }
 
@@ -181,10 +190,18 @@
 
 #pragma mark - UINavigationBarDelegate
 
-// 在不同系统上，扩展和子类里表现不一，所以就不支持默认返回按钮(backBarButtonItem)的拦截了
-//- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
-//    return [self canPopByClickOrGesture];
-//}
+- (BOOL)zhc_navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
+    
+    if ([self.visibleViewController respondsToSelector:@selector(zhc_navigationControllerCanPopBackByClick)]) {
+        return (BOOL)[self.visibleViewController performSelector:@selector(zhc_navigationControllerCanPopBackByClick)];
+    }
+    
+    if ([self.visibleViewController respondsToSelector:@selector(zhc_navigationControllerCanPopBack)]) {
+        return (BOOL)[self.visibleViewController performSelector:@selector(zhc_navigationControllerCanPopBack)];
+    }
+    
+    return YES;
+}
 
 #pragma mark - Helper
 
@@ -269,15 +286,22 @@
     
     if (self.viewControllers.count == 1) {  // 栈中控制器数量为1，只需展示这个VC的导航栏样式即可
         UIViewController *topVC = self.viewControllers.lastObject;
-        NaviBarConfigBlock topBlock = PerformSEL(topVC, @selector(zhc_navigationControllerSingleAppearenceConfig));
-        if (topBlock) {
-            topVC.zhc_navigationBarRefreshBlock = topBlock;
-        } else {
-            topVC.zhc_navigationBarRefreshBlock = PerformSEL(topVC, @selector(zhc_navigationControllerDefaultAppearenceConfig));
+        if (![topVC conformsToProtocol:@protocol(ZHCNavigationControllerDelegate)]) {
+            return;
+        }
+        __weak UIViewController<ZHCNavigationControllerDelegate> *zhcVC = (UIViewController<ZHCNavigationControllerDelegate> *)topVC;
+        
+        if ([zhcVC respondsToSelector:@selector(zhc_configNavigationControllerCustomAppearence:)]) {
+            zhcVC.zhc_navigationBarRefreshBlock = ^(UINavigationBar * _Nonnull naviBar) {
+                [zhcVC zhc_configNavigationControllerCustomAppearence:naviBar];
+            };
+        } else if ([zhcVC respondsToSelector:@selector(zhc_configNavigationControllerDefaultAppearence:)]) {
+            zhcVC.zhc_navigationBarRefreshBlock = ^(UINavigationBar * _Nonnull naviBar) {
+                [zhcVC zhc_configNavigationControllerDefaultAppearence:naviBar];
+            };
         }
     } else {                                // 栈中控制器数量大于1
         UIViewController *appearingVC, *disappearingVC;
-        NaviBarConfigBlock appearingBlock, disappearingBlock;
         if (type == 0) {    // 入栈
             appearingVC = self.viewControllers.lastObject;
             disappearingVC = self.viewControllers[self.viewControllers.count - 2];
@@ -285,29 +309,45 @@
             appearingVC = self.viewControllers[self.viewControllers.count - 2];
             disappearingVC = self.viewControllers.lastObject;
         }
-        appearingBlock = PerformSEL(appearingVC, @selector(zhc_navigationControllerSingleAppearenceConfig));
-        disappearingBlock = PerformSEL(disappearingVC, @selector(zhc_navigationControllerSingleAppearenceConfig));
+        
+        __weak UIViewController<ZHCNavigationControllerDelegate> *appearingZhcVC, *disappearingZhcVC;
+        
+        if ([appearingVC conformsToProtocol:@protocol(ZHCNavigationControllerDelegate)]) {
+            appearingZhcVC = (UIViewController<ZHCNavigationControllerDelegate> *)appearingVC;
+        }
+        if ([disappearingVC conformsToProtocol:@protocol(ZHCNavigationControllerDelegate)]) {
+            disappearingZhcVC = (UIViewController<ZHCNavigationControllerDelegate> *)disappearingVC;
+        }
         
         BOOL needRefreshNavigationBar;
-        if (mustRefresh) {
+        
+        if (!appearingZhcVC) {
+            // 未实现协议，不处理
+            return;
+        } else if (mustRefresh) {
+            needRefreshNavigationBar = YES;
+        } else if (!disappearingZhcVC) {
+            // disappearingVC 没有实现协议，可能 disappearingVC 修改了导航栏样式，这种情况也需要刷新UI。（比如push进了一个三方SDK提供的VC，然后再pop回来）
             needRefreshNavigationBar = YES;
         } else {
-            // 当任意一个block存在说明前后两个VC样式不一样，需要刷新UI
-            BOOL haveDiffAppearence = appearingBlock || disappearingBlock;
-            // disappearingVC 没有遵守 ZHCNavigationControllerDelegate 协议，可能 disappearingVC 修改了导航栏样式，这种情况也需要刷新UI。（比如push进了一个三方SDK提供的VC，然后再pop回来）
-            BOOL fromUnZHCVC = ![disappearingVC conformsToProtocol:@protocol(ZHCNavigationControllerDelegate)];
-            
-            needRefreshNavigationBar = haveDiffAppearence || fromUnZHCVC;
+            BOOL isCustomAppearingVC = [appearingZhcVC respondsToSelector:@selector(zhc_configNavigationControllerCustomAppearence:)];
+            BOOL isCustomDisappearingVC = [disappearingZhcVC respondsToSelector:@selector(zhc_configNavigationControllerCustomAppearence:)];
+            // 当任意一个VC实现了自定义方法，说明前后两个VC样式不一样，需要刷新UI
+            needRefreshNavigationBar = isCustomAppearingVC || isCustomDisappearingVC;
         }
-
+        
         if (needRefreshNavigationBar) {
-            if (appearingBlock) {
-                appearingVC.zhc_navigationBarRefreshBlock = appearingBlock;
-            } else {
-                appearingVC.zhc_navigationBarRefreshBlock = PerformSEL(appearingVC, @selector(zhc_navigationControllerDefaultAppearenceConfig));
+            if ([appearingZhcVC respondsToSelector:@selector(zhc_configNavigationControllerCustomAppearence:)]) {
+                appearingZhcVC.zhc_navigationBarRefreshBlock = ^(UINavigationBar * _Nonnull naviBar) {
+                    [appearingZhcVC zhc_configNavigationControllerCustomAppearence:naviBar];
+                };
+            } else if ([appearingZhcVC respondsToSelector:@selector(zhc_configNavigationControllerDefaultAppearence:)]) {
+                appearingZhcVC.zhc_navigationBarRefreshBlock = ^(UINavigationBar * _Nonnull naviBar) {
+                    [appearingZhcVC zhc_configNavigationControllerDefaultAppearence:naviBar];
+                };
             }
         } else {
-            appearingVC.zhc_navigationBarRefreshBlock = nil;
+            appearingZhcVC.zhc_navigationBarRefreshBlock = nil;
         }
     }
 }
