@@ -4,6 +4,8 @@ platform :ios, '9.0'
 
 target 'HungryToolsOC_Example' do
   pod 'HungryToolsOC', :path => '../'
+  
+  pod 'Masonry'
 
   target 'HungryToolsOC_Tests' do
     inherit! :search_paths

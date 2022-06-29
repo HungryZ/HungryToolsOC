@@ -1,9 +1,9 @@
 {
   "name": "HungryToolsOC",
   "version": "0.1.0",
-  "summary": "A short description of HungryToolsOC.",
-  "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/zhanghaichuan/HungryToolsOC",
+  "summary": "Some common tools",
+  "description": "Some tools often used.",
+  "homepage": "https://github.com/HungryZ/HungryToolsOC",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -12,7 +12,7 @@
     "zhanghaichuan": "924320752@qq.com"
   },
   "source": {
-    "git": "https://github.com/zhanghaichuan/HungryToolsOC.git",
+    "git": "https://github.com/HungryZ/HungryToolsOC.git",
     "tag": "0.1.0"
   },
   "platforms": {
