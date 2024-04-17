@@ -1,6 +1,6 @@
 {
   "name": "HungryToolsOC",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "summary": "Some common tools",
   "description": "Some tools often used.",
   "homepage": "https://github.com/HungryZ/HungryToolsOC",
@@ -13,15 +13,18 @@
   },
   "source": {
     "git": "https://github.com/HungryZ/HungryToolsOC.git",
-    "tag": "0.1.0"
+    "tag": "0.2.1"
+  },
+  "user_target_xcconfig": {
+    "GENERATE_INFOPLIST_FILE": "YES"
+  },
+  "pod_target_xcconfig": {
+    "GENERATE_INFOPLIST_FILE": "YES"
   },
   "platforms": {
     "ios": "9.0"
   },
-  "default_subspecs": [
-    "UITool",
-    "Category"
-  ],
+  "default_subspecs": "Category",
   "subspecs": [
     {
       "name": "Macro",

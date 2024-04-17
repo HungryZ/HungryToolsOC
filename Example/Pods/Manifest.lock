@@ -1,9 +1,7 @@
 PODS:
-  - HungryToolsOC (0.1.0):
-    - HungryToolsOC/Category (= 0.1.0)
-    - HungryToolsOC/UITool (= 0.1.0)
-  - HungryToolsOC/Category (0.1.0)
-  - HungryToolsOC/UITool (0.1.0)
+  - HungryToolsOC (0.2.1):
+    - HungryToolsOC/Category (= 0.2.1)
+  - HungryToolsOC/Category (0.2.1)
   - Masonry (1.1.0)
 
 DEPENDENCIES:
@@ -19,9 +17,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  HungryToolsOC: d04d08dad73e8af468184986fa1a3a0aed90adb5
+  HungryToolsOC: 80c94b7f9b8fd292959a7e6102e3a30685daf67f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
 
 PODFILE CHECKSUM: fb2cf1bbf94d208d6543496e9d747d1c9f08bdd2
 
-COCOAPODS: 1.10.2
+COCOAPODS: 1.10.1
